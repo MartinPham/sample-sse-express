@@ -1,0 +1,41 @@
+<html>
+    <body>
+        <div id="upload">
+            <input type="file"/>
+            <input type="submit" value="Upload" onclick="upload()"/>
+        </div>
+        <div id="progress" style="display: none">
+            Progress: <span id="percentage">0</span>%
+        </div>
+        <script>
+            function upload() 
+            {
+                fetch(
+                    '/process', 
+                    {
+                        method: 'post',
+                        body: ''
+                    }
+                )
+                .then(res => res.text())
+                .then(res => 
+                    {
+                        document.getElementById('upload').style.display = 'none'
+                        document.getElementById('progress').style.display = 'block'
+
+                        const channel = new EventSource('/job/' + res)
+
+                        channel.addEventListener(
+                            'message', 
+                            event => {
+                                const data = JSON.parse(event.data)
+                                document.getElementById('percentage').innerText = data.percentage
+                            }
+                        )
+                    }
+                )
+            }
+            
+        </script>
+    </body>
+</html>
